@@ -8,8 +8,6 @@ public interface PersonDAO {
 
     void savePerson(Person person);
 
-//    void haveIndex(long id);
-
     Person getPerson(long id);
 
     List<Person> getPersons();

@@ -4,10 +4,11 @@ import com.example.restapi.model.Address;
 import com.example.restapi.model.Person;
 import org.springframework.stereotype.Repository;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @Repository
 public class PersonDAOImpl implements PersonDAO {
@@ -51,7 +52,7 @@ public class PersonDAOImpl implements PersonDAO {
 
             new Person(10, "Abracham", "Prshetko", "1234567890",
                     new Address(10, "Poland", "Lublin", "Olerty", 100),
-                    LocalDate.of( 2009, Month.NOVEMBER, 30))));
+                    LocalDate.of(2009, Month.NOVEMBER, 30))));
 
     @Override
     public void savePerson(Person person) {

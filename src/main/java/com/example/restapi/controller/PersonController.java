@@ -11,19 +11,13 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 
 @RestController
 @Slf4j
 public class PersonController {
 
     @Autowired
-    private Random random;
-
-    @Autowired
     private PersonService personService;
-
-    private List<String> smartfones = Arrays.asList("XIOMI", "MEIZU");
 
     @GetMapping("/persons")
     public ResponseEntity<List<PersonDto>> getPersons() {
@@ -51,56 +45,5 @@ public class PersonController {
     public ResponseEntity<Void> deletePerson(@PathVariable long id) {
         personService.deletePerson(id);
         return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    @GetMapping("/hello")
-    public ResponseEntity<String> getSimpleOutput() {
-        boolean condition = random.nextBoolean();
-        if (condition) {
-            return new ResponseEntity<>("Hello world", HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>("Bad request", HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    @GetMapping("/demo/{categoryName}/{count}")
-    public ResponseEntity<List<String>> demo(@PathVariable String categoryName, @PathVariable int count,
-                                             @RequestParam(required = false) String hl, @RequestParam String sl) {
-        log.info("Sl is {}, hl is {}", sl, hl);
-        log.info("Category name is : {} , count is {}", categoryName, count);
-        if ("smartfon".equals(categoryName)) {
-            return new ResponseEntity<>(smartfones, HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-    }
-
-    @PostMapping("/demo")
-    public ResponseEntity<Void> postDemo(@RequestBody PersonDto personDto) {
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    @PostMapping("/demo1")
-    public ResponseEntity<Void> postDemo1(@RequestBody List<String> names) {
-        boolean condition = random.nextBoolean();
-        log.info("We got such request {}", names);
-        if (condition) {
-            return new ResponseEntity<>(HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
     }
 }

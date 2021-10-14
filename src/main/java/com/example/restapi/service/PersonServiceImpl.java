@@ -5,20 +5,18 @@ import com.example.restapi.dto.AddressDto;
 import com.example.restapi.dto.PersonDto;
 import com.example.restapi.model.Person;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
 public class PersonServiceImpl implements PersonService {
-
-    DateFormat df = new SimpleDateFormat("yyyy");
-    DateFormat dfOutPut = new SimpleDateFormat("dd/MM/yyyy");
 
     @Autowired
     public PersonDAO personDAO;
@@ -45,38 +43,33 @@ public class PersonServiceImpl implements PersonService {
         return personDto;
     }
 
-    @Override
-    public void updatePerson(long id, PersonDto personDto) {
-        //final Optional<Person> personById = this.getPersonById(id);
-        if (this.isPersonExist(id)) {
-            String stringName = personDto.getFullName();
-            String[] resultStringName = stringName.split(" ");
-            if (resultStringName.length != 2) {
-                throw new RuntimeException("Incorrect Full Name");
-            }
-            log.info("We got such person {}", personDto);
-            if (personDto.getPassword() == null) {
-                throw new RuntimeException("PASSWORD IS REQUIRED");
-            }
+    private void setPersonProperties(long id, PersonDto personDto, String[] resultStringName) {
+        Person person = this.getPerson(id);
+        person.setPassword(personDto.getPassword());
+        person.setFirstName(resultStringName[0]);
+        person.setLastName(resultStringName[1]);
+        person.setBirthday(personDto.getBirthday());
 
-            List<AddressDto> addressDto = personDto.getAddressDto();
-            if (addressDto == null || addressDto.isEmpty()) {
-                throw new RuntimeException("Please specify address");
-            }
+        person.getAddress().setCity(personDto.getAddressDto().get(0).getCity());
+        person.getAddress().setCountry(personDto.getAddressDto().get(0).getCountry());
+        person.getAddress().setBuild(personDto.getAddressDto().get(0).getBuild());
+        person.getAddress().setStreet(personDto.getAddressDto().get(0).getStreet());
+    }
 
-            Person person = this.getPerson(id);
-            person.setPassword(personDto.getPassword());
-            person.setFirstName(resultStringName[0]);
-            person.setLastName(resultStringName[1]);
-            person.setBirthday(personDto.getBirthday());
+    @NotNull
+    private String[] isFullNameCorrect(PersonDto personDto) {
+        String stringName = personDto.getFullName();
+        String[] resultStringName = stringName.split(" ");
+        if (resultStringName.length != 2) {
+            throw new RuntimeException("Incorrect Full Name");
+        }
+        return resultStringName;
+    }
 
-            person.getAddress().setCity(personDto.getAddressDto().get(0).getCity());
-            person.getAddress().setCountry(personDto.getAddressDto().get(0).getCountry());
-            person.getAddress().setBuild(personDto.getAddressDto().get(0).getBuild());
-            person.getAddress().setStreet(personDto.getAddressDto().get(0).getStreet());
-
-        } else {
-            throw new RuntimeException("Abra kadabra exception");
+    private void isAddressSpecify(PersonDto personDto) {
+        List<AddressDto> addressDto = personDto.getAddressDto();
+        if (addressDto == null || addressDto.isEmpty()) {
+            throw new RuntimeException("Please specify address");
         }
     }
 
@@ -90,6 +83,23 @@ public class PersonServiceImpl implements PersonService {
         }
         return false;
         //return personDAO.getPersons().stream().anyMatch(x -> x.getId() == 0);
+    }
+
+    @Override
+    public void updatePerson(long id, PersonDto personDto) {
+        //final Optional<Person> personById = this.getPersonById(id);
+        if (this.isPersonExist(id)) {
+            String[] resultStringName = isFullNameCorrect(personDto);
+
+            isAddressSpecify(personDto);
+
+            log.info("We got such person {}", personDto);
+
+            setPersonProperties(id, personDto, resultStringName);
+
+        } else {
+            throw new RuntimeException("Abra kadabra exception");
+        }
     }
 
     @Override
@@ -123,36 +133,25 @@ public class PersonServiceImpl implements PersonService {
         if (isPersonExist(personDto.getId())) {
             throw new RuntimeException(String.format("Person with id [%d] is present", personDto.getId()));
         } else {
-            String stringName = personDto.getFullName();
-            String[] resultStringName = stringName.split(" ");
-            if (resultStringName.length != 2) {
-                throw new RuntimeException("Incorrect Full Name");
-            }
-            log.info("We got such person {}", personDto);
-            if (personDto.getPassword() == null) {
-                throw new RuntimeException("PASSWORD IS REQUIRED");
-            }
+            String[] resultStringName = isFullNameCorrect(personDto);
 
-            List<AddressDto> addressDto = personDto.getAddressDto();
-            if (addressDto == null || addressDto.isEmpty()) {
-                throw new RuntimeException("Please specify address");
-            }
+            isAddressSpecify(personDto);
+            log.info("We got such person {}", personDto);
 
             Person person = new Person();
-            person.setId(personDto.getId());
-            person.setPassword(personDto.getPassword());
-            person.setFirstName(resultStringName[0]);
-            person.setLastName(resultStringName[1]);
-            person.setBirthday(personDto.getBirthday());
-
-
+            setPersonProperties(personDto.getId(), personDto, resultStringName);
+//            person.setId(personDto.getId());
+//            person.setPassword(personDto.getPassword());
+//            person.setFirstName(resultStringName[0]);
+//            person.setLastName(resultStringName[1]);
+//            person.setBirthday(personDto.getBirthday());
             personDAO.savePerson(person);
         }
     }
 
     @Override
     public void deletePerson(long id) {
-        if (isPersonExist(id)){
+        if (isPersonExist(id)) {
             List<Person> persons = personDAO.getPersons();
             for (Person result : persons) {
                 if (result.getId() == id) {
@@ -160,8 +159,7 @@ public class PersonServiceImpl implements PersonService {
                     return;
                 }
             }
-        }
-        else {
+        } else {
             throw new RuntimeException("Can`t delete... this Person don`t exist");
         }
     }

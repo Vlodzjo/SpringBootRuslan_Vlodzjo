@@ -4,9 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDate;
-import java.util.Calendar;
 
 
 @Data
@@ -18,11 +18,9 @@ public class Person {
     private long id;
     private String firstName;
     private String lastName;
-//    private int age;
+    @NotNull
     private String password;
     private Address address;
-
     private LocalDate birthday;
-    // додати дату народження і вираховувати від теперішнього року скільки age має person
 
 }
