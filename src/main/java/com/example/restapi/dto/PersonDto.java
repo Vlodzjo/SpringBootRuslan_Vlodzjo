@@ -25,7 +25,7 @@ public class PersonDto {
     @NotNull
     @Size(min = 1, message = "Minimal size pass = 1")
     private String password;
-
+    @NotEmpty
     @Email
     private String email;
 

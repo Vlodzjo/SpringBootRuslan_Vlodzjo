@@ -17,51 +17,61 @@ public class PersonDAOImpl implements PersonDAO {
             new Person(1, "John", "Stevenson", "123",
                     new Address(1, "Canada", "Toronto", "Lawbest", 11),
                     LocalDate.of(2000, Month.JANUARY, 21),
+                    "john@gmail.com",
                     new String[]{"soccer", "football"}),
 
             new Person(2, "Mike", "Fabrigas", "1234",
                     new Address(2, "USA", "Los-Angeles", "Holywood", 22),
                     LocalDate.of(2001, Month.FEBRUARY, 22),
+                    "mike@gmail.com",
                     new String[]{"soccer2", "football2"}),
 
             new Person(3, "Asafatii", "Aftanas", "1234",
                     new Address(3, "Ukraine", "Kyiv", "Khrechatyk", 33),
                     LocalDate.of(2002, Month.MARCH, 23),
+                    "asafatii@gmail.com",
                     new String[]{"soccer3", "football3"}),
 
             new Person(4, "Arnold", "Schwartzneger", "12345",
                     new Address(4, "USA", "Mayami", "Varchar", 44),
                     LocalDate.of(2003, Month.APRIL, 24),
+                    "arnold@gmail.com",
                     new String[]{"soccer4", "football4"}),
 
             new Person(5, "Nord", "Cotovich", "12345",
                     new Address(5, "Ukraine", "Lviv", "Holovatskogo", 55),
                     LocalDate.of(2004, Month.MAY, 25),
+                    "{}s`~gmailcom",
                     new String[]{"soccer5", "football5"}),
 
             new Person(6, "Chy", "Va", "123456",
                     new Address(6, "China", "Shanghai", "Big China Wall", 66),
                     LocalDate.of(2005, Month.JUNE, 26),
+                    "chy@gmail.com",
                     new String[]{"soccer6", "football6"}),
 
             new Person(7, "Austina", "Trinkas", "1234567",
                     new Address(7, "Doichland", "Drezden", "Krauter", 77),
                     LocalDate.of(2006, Month.JULY, 27),
+                    "austina@gmail.com",
                     new String[]{"soccer7", "football7"}),
 
             new Person(8, "Sebastian", "Developer", "12345678",
                     new Address(8, "Australia", "Singapore", "Jasalinte", 88),
                     LocalDate.of(2007, Month.AUGUST, 28),
+                    "sebastian@gmail.com",
                     new String[]{"soccer8", "football8"}),
 
             new Person(9, "Katalina", "Tornado", "123456789",
                     new Address(9, "Mexico", "Porkel", "Pleaser", 99),
                     LocalDate.of(2008, Month.SEPTEMBER, 29),
+                    "katalina@gmail.com",
                     new String[]{"soccer9", "football9"}),
 
             new Person(10, "Abracham", "Prshetko", "1234567890",
                     new Address(10, "Poland", "Lublin", "Olerty", 100),
                     LocalDate.of(2009, Month.NOVEMBER, 30),
+                    "abracham@gmail.com",
                     new String[]{"soccer10", "football10"})));
 
     @Override

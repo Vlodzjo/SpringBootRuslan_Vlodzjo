@@ -9,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -39,8 +41,9 @@ public class PersonServiceImpl implements PersonService {
         personDto.setFullName(person.getFirstName() + " " + person.getLastName());
         personDto.setId(person.getId());
         personDto.setBirthday(person.getBirthday());
-        personDto.setAddressDto(List.of(addressDto));
         personDto.setHobbiesDto(person.getHobbies());
+        personDto.setEmail(person.getEmail());
+        personDto.setAddressDto(List.of(addressDto));
 
         return personDto;
     }
@@ -57,6 +60,7 @@ public class PersonServiceImpl implements PersonService {
         person.setLastName(resultStringName[1]);
         person.setBirthday(personDto.getBirthday());
         person.setHobbies(personDto.getHobbiesDto());
+        person.setEmail(personDto.getEmail());
         person.setAddress(address);
 
         return person;
@@ -75,6 +79,7 @@ public class PersonServiceImpl implements PersonService {
         person.setLastName(resultStringName[1]);
         person.setBirthday(personDto.getBirthday());
         person.setHobbies(personDto.getHobbiesDto());
+        person.setEmail(personDto.getEmail());
         person.setAddress(address);
     }
 
@@ -116,7 +121,7 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
-    public void updatePerson(long id, PersonDto personDto) {
+    public void updatePerson(@Min(1) long id, PersonDto personDto) {
         //final Optional<Person> personById = this.getPersonById(id);
         if (this.isPersonExist(id)) {
 
@@ -132,12 +137,12 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
-    public Optional<Person> getOptionalPersonById(long id) {
+    public Optional<Person> getOptionalPersonById(@Min(1) long id) {
         return personDAO.getPersons().stream().filter(x -> x.getId() == id).findFirst();
     }
 
     @Override
-    public Person getPerson(long id) {
+    public Person getPerson(@Min(1) long id) {
         List<Person> persons = personDAO.getPersons();
         for (Person person : persons) {
             if (person.getId() == id) {
@@ -177,7 +182,7 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
-    public void deletePerson(long id) {
+    public void deletePerson(@Min(1) long id) {
         if (isPersonExist(id)) {
             List<Person> persons = personDAO.getPersons();
             for (Person result : persons) {
