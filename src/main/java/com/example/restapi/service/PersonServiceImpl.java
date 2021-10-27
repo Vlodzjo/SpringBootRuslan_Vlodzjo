@@ -5,56 +5,39 @@ import com.example.restapi.dto.AddressDto;
 import com.example.restapi.dto.PersonDto;
 import com.example.restapi.model.Address;
 import com.example.restapi.model.Person;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 
-import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class PersonServiceImpl implements PersonService {
 
-    @Autowired
     public PersonDAO personDAO;
-
-    private PersonDto setPersonDtoProperties(Person person) {
-        LocalDate dateNow = LocalDate.now();
-
-        PersonDto personDto = new PersonDto();
-        AddressDto addressDto = new AddressDto(
-                person.getAddress().getId(),
-                person.getAddress().getCountry(),
-                person.getAddress().getCity(),
-                person.getAddress().getStreet(),
-                person.getAddress().getBuild());
-
-        personDto.setAge(dateNow.getYear() - person.getBirthday().getYear());
-        personDto.setPassword(person.getPassword());
-        personDto.setEmail("test@gmail.com");
-        personDto.setFullName(person.getFirstName() + " " + person.getLastName());
-        personDto.setId(person.getId());
-        personDto.setBirthday(person.getBirthday());
-        personDto.setHobbiesDto(person.getHobbies());
-        personDto.setEmail(person.getEmail());
-        personDto.setAddressDto(List.of(addressDto));
-
-        return personDto;
-    }
+    public ConversionService conversionService;
 
     private Person setPersonProperties(PersonDto personDto) {
+        return setPersonProperties(null, personDto);
+    }
+
+    private Person setPersonProperties(Long id, PersonDto personDto) {
 
         String[] resultStringName = isFullNameCorrect(personDto);
         Address address = getAddressDto(personDto);
-
-        Person person = new Person();
-        person.setId(personDto.getId());
+        Person person;
+        if (id == null) {
+            person = new Person();
+        } else {
+            person = this.getPerson(id);
+        }
         person.setPassword(personDto.getPassword());
         person.setFirstName(resultStringName[0]);
         person.setLastName(resultStringName[1]);
@@ -62,26 +45,11 @@ public class PersonServiceImpl implements PersonService {
         person.setHobbies(personDto.getHobbiesDto());
         person.setEmail(personDto.getEmail());
         person.setAddress(address);
-
         return person;
     }
 
-    private void setPersonProperties(long id, PersonDto personDto) {
 
-        String[] resultStringName = isFullNameCorrect(personDto);
-        Address address = getAddressDto(personDto);
 
-        Person person = this.getPerson(id);
-//        Person person = new Person();
-//        person.setId(personDto.getId());
-        person.setPassword(personDto.getPassword());
-        person.setFirstName(resultStringName[0]);
-        person.setLastName(resultStringName[1]);
-        person.setBirthday(personDto.getBirthday());
-        person.setHobbies(personDto.getHobbiesDto());
-        person.setEmail(personDto.getEmail());
-        person.setAddress(address);
-    }
 
     private Address getAddressDto(PersonDto personDto) {
         return new Address(personDto.getAddressDto().get(0).getId(),
@@ -123,6 +91,7 @@ public class PersonServiceImpl implements PersonService {
     @Override
     public void updatePerson(@Min(1) long id, PersonDto personDto) {
         //final Optional<Person> personById = this.getPersonById(id);
+        personDto.setId(id);
         if (this.isPersonExist(id)) {
 
             isAddressSpecify(personDto);
@@ -157,7 +126,8 @@ public class PersonServiceImpl implements PersonService {
         List<Person> persons = personDAO.getPersons();
         List<PersonDto> result = new ArrayList<>();
         for (Person person : persons) {
-            result.add(setPersonDtoProperties(person));
+            PersonDto converted = conversionService.convert(person, PersonDto.class);
+            result.add(converted);
         }
         return result;
     }

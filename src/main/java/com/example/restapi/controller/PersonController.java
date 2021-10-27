@@ -3,23 +3,22 @@ package com.example.restapi.controller;
 import com.example.restapi.dto.PersonDto;
 import com.example.restapi.model.Person;
 import com.example.restapi.service.PersonService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
 import java.util.List;
 
 @RestController
 @Slf4j
 @Validated
+@RequiredArgsConstructor
 public class PersonController {
 
-    @Autowired
-    private PersonService personService;
+    public PersonService personService;
 
     @GetMapping("/persons")
     public ResponseEntity<List<PersonDto>> getPersons() {
