@@ -5,6 +5,7 @@ import com.example.restapi.model.Person;
 import com.example.restapi.service.PersonService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -18,6 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PersonController {
 
+    @Autowired
     public PersonService personService;
 
     @GetMapping("/persons")

@@ -14,8 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 public class PersonDto {
 
-    @Min(value = 1, message = "Minimal id = 1")
-    private long id;
+    private Long id;
     @NotBlank(message = "FullName must been blanked")
     private String fullName;
     @Min(value = 1, message = "Minimal value = 1")
@@ -25,6 +24,7 @@ public class PersonDto {
     @NotNull
     @Size(min = 1, message = "Minimal size pass = 1")
     private String password;
+
     @NotEmpty
     @Email
     private String email;

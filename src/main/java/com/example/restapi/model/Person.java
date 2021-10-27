@@ -17,7 +17,6 @@ import java.time.LocalDate;
 @Validated
 public class Person {
 
-    @Min(value = 1, message = "Minimal id = 1")
     private long id;
     @NotBlank(message = "FirstName must been blanked")
     private String firstName;

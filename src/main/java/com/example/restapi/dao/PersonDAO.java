@@ -10,6 +10,8 @@ public interface PersonDAO {
 
     Person getPerson(long id);
 
+    void updatePerson(long id, Person person);
+
     List<Person> getPersons();
 
     void removePerson(Person person);
