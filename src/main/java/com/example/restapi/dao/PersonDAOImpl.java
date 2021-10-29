@@ -126,7 +126,9 @@ public class PersonDAOImpl implements PersonDAO {
         for (Person pers : personList) {
             if (pers.getId().equals(id)) {
                 personList.set(index, person);
-            } else index++;
+            } else {
+                index++;
+            }
         }
     }
 }

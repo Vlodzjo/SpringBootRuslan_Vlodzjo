@@ -12,7 +12,6 @@ import java.util.UUID;
 public class AddressDto {
 
     private UUID id;
-//    private long id;
     private String country;
     private String city;
     private String street;

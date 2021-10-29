@@ -16,7 +16,7 @@ import java.util.UUID;
 
 @Data
 @NoArgsConstructor
-public class PersonDto{
+public class PersonDto {
 
     private UUID id;
     @NotBlank(message = "FullName must not been blanked")
@@ -36,6 +36,8 @@ public class PersonDto{
 
     private List<String> hobbiesDto;
 
+    @NotNull
+    @NotEmpty
     private List<AddressDto> addressDto;
 
     private LocalDate birthday;

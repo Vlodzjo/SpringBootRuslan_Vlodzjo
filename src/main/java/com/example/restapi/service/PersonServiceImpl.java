@@ -26,13 +26,6 @@ public class PersonServiceImpl implements PersonService, CustomValidator<PersonD
     public final ConversionService conversionService;
     private final Validator validator;
 
-    private void isAddressSpecify(PersonDto personDto) {
-        List<AddressDto> addressDto = personDto.getAddressDto();
-        if (addressDto == null || addressDto.isEmpty()) {
-            throw new RuntimeException("Please specify address");
-        }
-    }
-
     @Override
     public boolean isPersonExist(UUID id) {
         List<Person> persons = personDAO.getPersons();
@@ -46,8 +39,6 @@ public class PersonServiceImpl implements PersonService, CustomValidator<PersonD
     public void updatePerson(UUID id, PersonDto personDto) {
         validate(personDto);
         if (this.isPersonExist(id)) {
-
-            isAddressSpecify(personDto);
 
             log.info("We got such person {}", personDto);
 
@@ -84,7 +75,6 @@ public class PersonServiceImpl implements PersonService, CustomValidator<PersonD
         if (isPersonExist(personDto.getId())) {
             throw new UserAlreadyExistsException(String.format("Person with id [%d] is present", personDto.getId().hashCode()));
         } else {
-            isAddressSpecify(personDto);
             log.info("We got such person {}", personDto);
 
             personDto.setId(null);

@@ -30,6 +30,8 @@ public class Person {
     @NotBlank(message = "New password is mandatory")
     @ValidPassword
     private String password;
+    @NotNull
+    @NotEmpty
     private Address address;
     private LocalDate birthday;
     @NotBlank
