@@ -4,10 +4,12 @@ import com.example.restapi.dto.AddressDto;
 import com.example.restapi.dto.PersonDto;
 import com.example.restapi.model.Person;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.List;
 
+@Component
 public class PersonToPersonDtoConverter implements Converter<Person, PersonDto> {
 
     @Override

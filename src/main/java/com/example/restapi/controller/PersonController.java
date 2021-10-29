@@ -7,18 +7,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
-@RestController
 @Slf4j
-@Validated
 @RequiredArgsConstructor
+@RestController
 public class PersonController {
 
-    public PersonService personService;
+    public final PersonService personService;
 
     @GetMapping("/persons")
     public ResponseEntity<List<PersonDto>> getPersons() {
@@ -26,12 +25,12 @@ public class PersonController {
     }
 
     @GetMapping("/persons/{id}")
-    public ResponseEntity<Person> getPerson(@PathVariable long id) {
+    public ResponseEntity<Person> getPerson(@PathVariable UUID id) {
         return new ResponseEntity<>(personService.getPerson(id), HttpStatus.OK);
     }
 
     @PutMapping("/persons/{id}")
-    public ResponseEntity<Void> updatePerson(@PathVariable long id, @RequestBody PersonDto personDto) {
+    public ResponseEntity<Void> updatePerson(@PathVariable UUID id, @RequestBody PersonDto personDto) {
         personService.updatePerson(id, personDto);
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -43,7 +42,7 @@ public class PersonController {
     }
 
     @DeleteMapping("/person/{id}")
-    public ResponseEntity<Void> deletePerson(@PathVariable long id) {
+    public ResponseEntity<Void> deletePerson(@PathVariable UUID id) {
         personService.deletePerson(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }

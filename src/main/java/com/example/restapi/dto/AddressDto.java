@@ -4,15 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.constraints.Min;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
 @Validated
 public class AddressDto {
 
-    @Min(value = 1, message = "Minimal id = 1")
-    private long id;
+    private UUID id;
     private String country;
     private String city;
     private String street;
