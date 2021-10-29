@@ -1,13 +1,16 @@
 package com.example.restapi.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.springframework.validation.annotation.Validated;
-
+import validation.ValidPassword;
 import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.UUID;
 
 
 @Data
@@ -17,19 +20,20 @@ import java.time.LocalDate;
 @Validated
 public class Person {
 
-    private long id;
+    private UUID id;
     @NotBlank(message = "FirstName must been blanked")
     private String firstName;
     @NotBlank(message = "LastName must been blanked")
     private String lastName;
+    @JsonProperty("password")
     @NotNull
-    @Size(min = 1, message = "Minimal pass size = 1")
+    @NotBlank(message = "New password is mandatory")
+    @ValidPassword
     private String password;
     private Address address;
     private LocalDate birthday;
-    @NotEmpty
+    @NotBlank
     @Email
     private String email;
-    private String[] hobbies;
-
+    private List<String> hobbies;
 }

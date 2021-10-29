@@ -3,14 +3,15 @@ package com.example.restapi.dao;
 import com.example.restapi.model.Person;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface PersonDAO {
 
     void savePerson(Person person);
 
-    Person getPerson(long id);
+    Person getPerson(UUID id);
 
-    void updatePerson(long id, Person person);
+    void updatePerson(UUID id, Person person);
 
     List<Person> getPersons();
 

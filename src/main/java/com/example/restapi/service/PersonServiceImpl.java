@@ -4,71 +4,27 @@ import com.example.restapi.dao.PersonDAO;
 import com.example.restapi.dto.AddressDto;
 import com.example.restapi.dto.PersonDto;
 import com.example.restapi.exception.UserAlreadyExistsException;
-import com.example.restapi.model.Address;
+import com.example.restapi.exception.UserNotFoundException;
 import com.example.restapi.model.Person;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
+import validation.CustomValidator;
 
-import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
+import javax.validation.Validator;
 import java.util.List;
-import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class PersonServiceImpl implements PersonService {
+public class PersonServiceImpl implements PersonService, CustomValidator<PersonDto> {
 
-    @Autowired
-    public PersonDAO personDAO;
-    @Autowired
-    public ConversionService conversionService;
-
-    private Person setPersonProperties(PersonDto personDto) {
-        return setPersonProperties(null, personDto);
-    }
-
-    private Person setPersonProperties(Long id, PersonDto personDto) {
-        String[] resultStringName = isFullNameCorrect(personDto);
-        Address address = getAddressDto(personDto);
-        Person person;
-        if (id == null) {
-            person = new Person();
-            person.setId(personDto.getId());
-        } else {
-            person = this.getPerson(id);
-        }
-        person.setPassword(personDto.getPassword());
-        person.setFirstName(resultStringName[0]);
-        person.setLastName(resultStringName[1]);
-        person.setBirthday(personDto.getBirthday());
-        person.setHobbies(personDto.getHobbiesDto());
-        person.setEmail(personDto.getEmail());
-        person.setAddress(address);
-        return person;
-    }
-
-
-    private Address getAddressDto(PersonDto personDto) {
-        return new Address(personDto.getAddressDto().get(0).getId(),
-                personDto.getAddressDto().get(0).getCity(),
-                personDto.getAddressDto().get(0).getCountry(),
-                personDto.getAddressDto().get(0).getStreet(),
-                personDto.getAddressDto().get(0).getBuild());
-    }
-
-    @NotNull
-    private String[] isFullNameCorrect(PersonDto personDto) {
-        String stringName = personDto.getFullName();
-        String[] resultStringName = stringName.split(" ");
-        if (resultStringName.length != 2) {
-            throw new RuntimeException("Incorrect Full Name");
-        }
-        return resultStringName;
-    }
+    public final PersonDAO personDAO;
+    public final ConversionService conversionService;
+    private final Validator validator;
 
     private void isAddressSpecify(PersonDto personDto) {
         List<AddressDto> addressDto = personDto.getAddressDto();
@@ -78,28 +34,27 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
-    public boolean isPersonExist(long id) {
+    public boolean isPersonExist(UUID id) {
         List<Person> persons = personDAO.getPersons();
-        for (Person result : persons) {
-            if (result.getId() == id) {
-                return true;
-            }
-        }
-        return false;
+        return persons.stream()
+                .anyMatch(result -> result
+                        .getId()
+                        .equals(id));
     }
 
     @Override
-    public void updatePerson(@NotNull long id, PersonDto personDto) {
-//        final Optional<Person> personById = this.getPersonById(id);
+    public void updatePerson(UUID id, PersonDto personDto) {
+        validate(personDto);
         if (this.isPersonExist(id)) {
 
             isAddressSpecify(personDto);
 
             log.info("We got such person {}", personDto);
 
-//            setPersonProperties(id, personDto);
             personDto.setId(id);
-            conversionService.convert(personDto, Person.class);
+            Person person = conversionService.convert(personDto, Person.class);
+
+            personDAO.updatePerson(id, person);
 
         } else {
             throw new RuntimeException("Abra kadabra exception person is not present");
@@ -107,12 +62,7 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
-    public Optional<Person> getOptionalPersonById(@NotNull long id) {
-        return personDAO.getPersons().stream().filter(x -> x.getId() == id).findFirst();
-    }
-
-    @Override
-    public Person getPerson(@NotNull long id) {
+    public Person getPerson(UUID id) {
         if (isPersonExist(id)) {
             return personDAO.getPerson(id);
         } else {
@@ -123,24 +73,20 @@ public class PersonServiceImpl implements PersonService {
     @Override
     public List<PersonDto> getPersons() {
         List<Person> persons = personDAO.getPersons();
-        List<PersonDto> result = new ArrayList<>();
-        for (Person person : persons) {
-            PersonDto converted = conversionService.convert(person, PersonDto.class);
-            result.add(converted);
-        }
-        return result;
+        return persons.stream()
+                .map(person -> conversionService.convert(person, PersonDto.class))
+                .collect(Collectors.toList());
     }
 
     @Override
     public void createPerson(PersonDto personDto) {
+        validate(personDto);
         if (isPersonExist(personDto.getId())) {
-            throw new UserAlreadyExistsException(String.format("Person with id [%d] is present", personDto.getId()));
+            throw new UserAlreadyExistsException(String.format("Person with id [%d] is present", personDto.getId().hashCode()));
         } else {
-
             isAddressSpecify(personDto);
             log.info("We got such person {}", personDto);
 
-//            Person person = setPersonProperties(personDto);
             personDto.setId(null);
             Person person = conversionService.convert(personDto, Person.class);
 
@@ -149,17 +95,19 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
-    public void deletePerson(@NotNull long id) {
+    public void deletePerson(UUID id) {
         if (isPersonExist(id)) {
-            List<Person> persons = personDAO.getPersons();
-            for (Person result : persons) {
-                if (result.getId() == id) {
-                    personDAO.removePerson(result);
-                    return;
-                }
-            }
+            personDAO.getPersons().stream()
+                    .filter(result -> result.getId().equals(id))
+                    .findFirst()
+                    .ifPresent(personDAO::removePerson);
         } else {
-            throw new RuntimeException("Can`t delete... this Person don`t exist");
+            throw new UserNotFoundException("Can`t delete... this Person don`t exist");
         }
+    }
+
+    @Override
+    public javax.validation.Validator getValidator() {
+        return validator;
     }
 }

@@ -4,12 +4,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.UUID;
+
 @Data
 @AllArgsConstructor
 @Validated
 public class AddressDto {
 
-    private long id;
+    private UUID id;
+//    private long id;
     private String country;
     private String city;
     private String street;

@@ -4,17 +4,19 @@ import com.example.restapi.dao.PersonDAOImpl;
 import com.example.restapi.dto.PersonDto;
 import com.example.restapi.model.Address;
 import com.example.restapi.model.Person;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Component
+@RequiredArgsConstructor
 public class PersonDtoToPersonConverter implements Converter<PersonDto, Person> {
 
-    @Autowired
-    private PersonDAOImpl personDAO;
+    private final PersonDAOImpl personDAO;
 
     @Override
     public Person convert(PersonDto personDto) {
@@ -30,9 +32,8 @@ public class PersonDtoToPersonConverter implements Converter<PersonDto, Person> 
                     personDto.getAddressDto().get(0).getBuild());
             Person person;
             if (personDto.getId() == null) {
-                Long maxId = personDAO.getPersons().stream().map(Person::getId).max(Long::compare).orElse(0L);
                 person = new Person();
-                person.setId(maxId + 1L);
+                person.setId(UUID.randomUUID());
             } else {
                 person = personDAO.getPerson(personDto.getId());
             }
