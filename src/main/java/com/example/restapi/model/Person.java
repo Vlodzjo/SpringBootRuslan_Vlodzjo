@@ -1,15 +1,14 @@
 package com.example.restapi.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import org.springframework.validation.annotation.Validated;
-import validation.ValidPassword;
-import javax.validation.constraints.*;
+
+import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 
@@ -17,25 +16,42 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-@Validated
+@Entity
+@Table(
+        name = "person",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "person_email_unique", columnNames = "email")
+        }
+)
 public class Person {
 
+    @Id
+    @GeneratedValue(
+            strategy = GenerationType.AUTO,
+            generator = "person_auto")
+    @Column(updatable = false)
     private UUID id;
-    @NotBlank(message = "FirstName must been blanked")
+
+    @Column(name = "first_name")
     private String firstName;
-    @NotBlank(message = "LastName must been blanked")
+
+    @Column(name = "last_name", nullable = false)
     private String lastName;
-    @JsonProperty("password")
-    @NotNull
-    @NotBlank(message = "New password is mandatory")
-    @ValidPassword
+
+    @Column(name = "password", nullable = false)
     private String password;
-    @NotNull
-    @NotEmpty
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "address_id", referencedColumnName = "id")
     private Address address;
+
+    @Column(nullable = false)
     private LocalDate birthday;
-    @NotBlank
-    @Email
+
+    @Column(name = "email")
     private String email;
-    private List<String> hobbies;
+
+    @OneToMany(mappedBy = "person")
+    private Set<PersonVaccine> personVaccines;
+
 }

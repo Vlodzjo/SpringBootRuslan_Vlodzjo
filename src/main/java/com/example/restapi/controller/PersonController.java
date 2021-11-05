@@ -1,6 +1,7 @@
 package com.example.restapi.controller;
 
 import com.example.restapi.dto.PersonDto;
+import com.example.restapi.dto.SearchPersonDto;
 import com.example.restapi.model.Person;
 import com.example.restapi.service.PersonService;
 import lombok.RequiredArgsConstructor;
@@ -46,4 +47,10 @@ public class PersonController {
         personService.deletePerson(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @PostMapping("/search")
+    public ResponseEntity<List<PersonDto>> searchPersonDto(@RequestBody SearchPersonDto searchPersonDto) {
+        return new ResponseEntity<>(personService.searchPersonByEmail(searchPersonDto), HttpStatus.OK);
+    }
+
 }
