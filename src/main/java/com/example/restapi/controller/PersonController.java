@@ -1,7 +1,7 @@
 package com.example.restapi.controller;
 
 import com.example.restapi.dto.PersonDto;
-import com.example.restapi.model.Person;
+import com.example.restapi.dto.SearchPersonDto;
 import com.example.restapi.service.PersonService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +25,7 @@ public class PersonController {
     }
 
     @GetMapping("/persons/{id}")
-    public ResponseEntity<Person> getPerson(@PathVariable UUID id) {
+    public ResponseEntity<PersonDto> getPerson(@PathVariable UUID id) {
         return new ResponseEntity<>(personService.getPerson(id), HttpStatus.OK);
     }
 
@@ -44,6 +44,17 @@ public class PersonController {
     @DeleteMapping("/person/{id}")
     public ResponseEntity<Void> deletePerson(@PathVariable UUID id) {
         personService.deletePerson(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/search")
+    public ResponseEntity<List<PersonDto>> searchPersonDto(@RequestBody SearchPersonDto searchPersonDto) {
+        return new ResponseEntity<>(personService.searchPersonByEmail(searchPersonDto), HttpStatus.OK);
+    }
+
+    @PostMapping("/persons/{personId}/vaccines/{vaccineId}")
+    public ResponseEntity<Void> doVaccine(@PathVariable UUID personId, @PathVariable UUID vaccineId) {
+        personService.doVaccine(personId, vaccineId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

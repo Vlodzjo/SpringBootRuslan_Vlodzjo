@@ -1,37 +1,72 @@
 package com.example.restapi.converter;
 
-import com.example.restapi.dto.AddressDto;
-import com.example.restapi.dto.PersonDto;
-import com.example.restapi.model.Person;
+import com.example.restapi.dto.*;
+import com.example.restapi.model.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.Period;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class PersonToPersonDtoConverter implements Converter<Person, PersonDto> {
 
     @Override
     public PersonDto convert(Person person) {
         LocalDate dateNow = LocalDate.now();
         PersonDto personDto = new PersonDto();
-        AddressDto addressDto = new AddressDto(
-                person.getAddress().getId(),
-                person.getAddress().getCountry(),
-                person.getAddress().getCity(),
-                person.getAddress().getStreet(),
-                person.getAddress().getBuild());
+        Address address = person.getAddress();
+        Document document = person.getDocuments();
+        Passport passport = person.getDocuments().getPassport();
+        Identification identification = person.getDocuments().getIdentification();
+        if (address != null) {
+            AddressDto addressDto = new AddressDto(address.getId(), address.getCountry(),
+                    address.getCity(), address.getStreet(), address.getBuild());
+            personDto.setAddressDto(addressDto);
+        }
 
-        personDto.setAge(dateNow.getYear() - person.getBirthday().getYear());
+        if (!person.getVaccines().isEmpty()) {
+            List<PersonVaccineDto> personVaccineDtos = new ArrayList<>();
+            List<PersonVaccine> vaccines = person.getVaccines();
+            for (PersonVaccine personVaccine : vaccines) {
+                PersonVaccineDto personVaccineDto = new PersonVaccineDto();
+                personVaccineDto.setName(personVaccine.getVaccine().getName());
+                personVaccineDto.setDateOfVaccine(personVaccine.getCreatedOn());
+                personVaccineDtos.add(personVaccineDto);
+            }
+            personDto.setVaccines(personVaccineDtos);
+        }
+
+        DocumentDto documentDto = new DocumentDto(
+                document.getId(),
+                new PassportDto(
+                        passport.getId(),
+                        passport.getPassportNumberStr().toUpperCase(),
+                        passport.getPassportNumberInt(),
+                        passport.getSex(),
+                        passport.getDateOfIssue(),
+                        passport.getDateOfExpiry(),
+                        passport.getAuthority()
+                ),
+                new IdentificationDto(
+                        identification.getId(),
+                        identification.getIdentificationNumber())
+        );
+
+        personDto.setId(person.getId());
+        personDto.setFullName(person.getFirstName() + " " + person.getLastName());
+
+        personDto.setAge(Period.between(person.getBirthday(), dateNow).getYears());
         personDto.setPassword(person.getPassword());
         personDto.setEmail("test@gmail.com");
-        personDto.setFullName(person.getFirstName() + " " + person.getLastName());
-        personDto.setId(person.getId());
         personDto.setBirthday(person.getBirthday());
-        personDto.setHobbiesDto(person.getHobbies());
         personDto.setEmail(person.getEmail());
-        personDto.setAddressDto(List.of(addressDto));
+        personDto.setDocumentDto(documentDto);
+
         return personDto;
     }
 }

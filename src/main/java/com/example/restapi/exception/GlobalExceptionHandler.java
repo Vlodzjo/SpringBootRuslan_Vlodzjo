@@ -1,6 +1,6 @@
 package com.example.restapi.exception;
 
-import org.springframework.http.HttpHeaders;
+import org.postgresql.util.PSQLException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -18,13 +18,12 @@ import java.util.List;
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(value = {UserAlreadyExistsException.class})
-    protected ResponseEntity<Object> handleNotFoundException(UserAlreadyExistsException ex, WebRequest request) {
-        String bodyOfResponse = "User already exists in the system";
-        return handleExceptionInternal(ex, bodyOfResponse, new HttpHeaders(), HttpStatus.NOT_FOUND, request);
+    protected ResponseEntity<CustomErrorResponse> handleNotFoundException(UserAlreadyExistsException ex, WebRequest request) {
+        return getCustomErrorResponseResponseEntity(ex, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(value = {IllegalArgumentException.class})
-    protected ResponseEntity<CustomErrorResponse> handleBadRequestException(IllegalArgumentException ex) {
+    @ExceptionHandler(value = {IllegalArgumentException.class, PSQLException.class})
+    protected ResponseEntity<CustomErrorResponse> handleBadRequestException(Exception ex) {
         return getCustomErrorResponseResponseEntity(ex, HttpStatus.BAD_REQUEST);
     }
 
@@ -52,12 +51,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 , httpStatus);
     }
 
-    @ExceptionHandler(value = {UserNotFoundException.class})
-    protected ResponseEntity<CustomErrorResponse> handleNotFoundException(UserNotFoundException ex, WebRequest a) {
+    @ExceptionHandler(value = {UserNotFoundException.class, VaccineNotFoundException.class})
+    protected ResponseEntity<CustomErrorResponse> handleNotFoundException(RuntimeException ex, WebRequest a) {
         return getCustomErrorResponseResponseEntity(ex, HttpStatus.NOT_FOUND);
     }
 
-    private ResponseEntity<CustomErrorResponse> getCustomErrorResponseResponseEntity(RuntimeException ex, HttpStatus httpStatus) {
+    private ResponseEntity<CustomErrorResponse> getCustomErrorResponseResponseEntity(Exception ex, HttpStatus httpStatus) {
         CustomErrorResponse customErrorResponse = new CustomErrorResponse();
         customErrorResponse.setErrorCode(httpStatus.getReasonPhrase());
         customErrorResponse.setStatus(httpStatus.value());
