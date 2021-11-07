@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
@@ -16,6 +18,9 @@ import java.util.UUID;
 @NoArgsConstructor
 public class PersonDto {
 
+    @GeneratedValue(
+            strategy = GenerationType.AUTO,
+            generator = "passport_auto")
     private UUID id;
 
     @NotBlank(message = "FullName must not been blanked")
@@ -37,6 +42,8 @@ public class PersonDto {
 
     private LocalDate birthday;
 
-    private List<VaccineDto> vaccines;
+    private List<PersonVaccineDto> vaccines;
+
+    private DocumentDto documentDto;
 
 }

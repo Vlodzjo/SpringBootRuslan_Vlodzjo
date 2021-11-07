@@ -1,9 +1,9 @@
 package com.example.restapi.converter;
 
+import com.example.restapi.dto.IdentificationDto;
+import com.example.restapi.dto.PassportDto;
 import com.example.restapi.dto.PersonDto;
-import com.example.restapi.model.Address;
-import com.example.restapi.model.Person;
-import com.example.restapi.model.Vaccine;
+import com.example.restapi.model.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
@@ -24,6 +24,22 @@ public class PersonDtoToPersonConverter implements Converter<PersonDto, Person> 
                     personDto.getAddressDto().getCountry(),
                     personDto.getAddressDto().getStreet(),
                     personDto.getAddressDto().getBuild());
+            PassportDto passportDto = personDto.getDocumentDto().getPassportDto();
+            IdentificationDto identificationDto = personDto.getDocumentDto().getIdentificationDto();
+            Document document = new Document(
+                    personDto.getDocumentDto().getId(),
+                    new Passport(
+                            passportDto.getId(),
+                            passportDto.getPassportNumberStr().toUpperCase(),
+                            passportDto.getPassportNumberInt(),
+                            passportDto.getSex(),
+                            passportDto.getDateOfIssue(),
+                            passportDto.getDateOfIssue().plusYears(10L),
+                            passportDto.getAuthority()),
+                    new Identification(
+                            identificationDto.getId(),
+                            identificationDto.getIdentificationNumber())
+            );
             Person person = new Person();
             person.setId(personDto.getId());
             person.setPassword(personDto.getPassword());
@@ -32,6 +48,7 @@ public class PersonDtoToPersonConverter implements Converter<PersonDto, Person> 
             person.setBirthday(personDto.getBirthday());
             person.setEmail(personDto.getEmail());
             person.setAddress(address);
+            person.setDocuments(document);
             return person;
         }
     }

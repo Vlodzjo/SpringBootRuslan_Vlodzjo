@@ -1,9 +1,9 @@
 package com.example.restapi.converter;
 
-import org.springframework.core.convert.converter.Converter;
-import org.springframework.stereotype.Component;
 import com.example.restapi.dto.VaccineDto;
 import com.example.restapi.model.Vaccine;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.stereotype.Component;
 
 @Component
 public class VaccineToVaccineDtoConverter implements Converter<Vaccine, VaccineDto> {

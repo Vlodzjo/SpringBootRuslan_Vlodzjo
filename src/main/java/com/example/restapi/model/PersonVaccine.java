@@ -3,30 +3,59 @@ package com.example.restapi.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.Objects;
 
-
+@Entity(name = "PersonVaccine")
+@Table(name = "person_vaccine")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
 public class PersonVaccine {
 
     @EmbeddedId
-    private PersonVaccineKey id;
+    private PersonVaccineId id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("personId")
-    @JoinColumn(name = "person_id")
+    @ToString.Exclude
     private Person person;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("vaccineId")
-    @JoinColumn(name = "vaccine_id")
+    @ToString.Exclude
     private Vaccine vaccine;
 
-    private LocalDate vactinationDay;
+    @Column(name = "vaccinated_on")
+    private LocalDate createdOn;
+
+    public PersonVaccine(Person person, Vaccine vaccine) {
+        this.person = person;
+        this.vaccine = vaccine;
+        this.id = new PersonVaccineId(person.getId(), vaccine.getId());
+        this.createdOn = LocalDate.now();
+    }
+
+    //Getters and setters omitted for brevity
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass())
+            return false;
+
+        PersonVaccine that = (PersonVaccine) o;
+        return Objects.equals(person, that.person) &&
+                Objects.equals(vaccine, that.vaccine);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(person, vaccine);
+    }
 
 }

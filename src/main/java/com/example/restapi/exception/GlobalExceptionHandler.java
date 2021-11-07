@@ -51,8 +51,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 , httpStatus);
     }
 
-    @ExceptionHandler(value = {UserNotFoundException.class})
-    protected ResponseEntity<CustomErrorResponse> handleNotFoundException(UserNotFoundException ex, WebRequest a) {
+    @ExceptionHandler(value = {UserNotFoundException.class, VaccineNotFoundException.class})
+    protected ResponseEntity<CustomErrorResponse> handleNotFoundException(RuntimeException ex, WebRequest a) {
         return getCustomErrorResponseResponseEntity(ex, HttpStatus.NOT_FOUND);
     }
 

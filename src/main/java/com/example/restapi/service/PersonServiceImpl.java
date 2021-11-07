@@ -5,7 +5,10 @@ import com.example.restapi.dto.SearchPersonDto;
 import com.example.restapi.exception.UserAlreadyExistsException;
 import com.example.restapi.exception.UserNotFoundException;
 import com.example.restapi.model.Person;
+import com.example.restapi.model.PersonVaccine;
+import com.example.restapi.model.Vaccine;
 import com.example.restapi.repository.PersonRepository;
+import com.example.restapi.repository.VaccineRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -15,7 +18,6 @@ import validation.CustomValidator;
 
 import javax.validation.Validator;
 import java.time.LocalDate;
-import java.time.Period;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -27,6 +29,7 @@ import java.util.stream.Collectors;
 public class PersonServiceImpl implements PersonService, CustomValidator {
 
     public final PersonRepository personRepository;
+    public final VaccineRepository vaccineRepository;
     public final ConversionService conversionService;
     private final Validator validator;
 
@@ -50,10 +53,10 @@ public class PersonServiceImpl implements PersonService, CustomValidator {
     }
 
     @Override
-    public Person getPerson(UUID id) {
+    public PersonDto getPerson(UUID id) {
         Optional<Person> byId = personRepository.findById(id);
         if (byId.isPresent()) {
-            return byId.get();
+            return conversionService.convert(byId.get(), PersonDto.class);
         } else {
             throw new UserNotFoundException(String.format("Client was not found with id [%d] ", id));
         }
@@ -138,5 +141,20 @@ public class PersonServiceImpl implements PersonService, CustomValidator {
             }
         }
     }
+
+    @Override
+    public void doVaccine(UUID personId, UUID vaccineId) {
+        Optional<Person> personOptional = personRepository.findById(personId);
+        Optional<Vaccine> vaccineOptional = vaccineRepository.findById(vaccineId);
+        if (vaccineOptional.isPresent() & personOptional.isPresent()) {
+            Person person = personOptional.get();
+            PersonVaccine personVaccine = new PersonVaccine(person, vaccineOptional.get());
+            person.getVaccines().add(personVaccine);
+            personRepository.save(person);
+        } else {
+            throw new IllegalArgumentException("Vaccine and person id is mandatory");
+        }
+    }
+
 
 }

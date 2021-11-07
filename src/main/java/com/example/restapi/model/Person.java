@@ -3,12 +3,14 @@ package com.example.restapi.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
+import java.util.Objects;
 import java.util.UUID;
 
 
@@ -16,7 +18,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-@Entity
+@Entity(name = "Person")
 @Table(
         name = "person",
         uniqueConstraints = {
@@ -51,7 +53,32 @@ public class Person {
     @Column(name = "email")
     private String email;
 
-    @OneToMany(mappedBy = "person")
-    private Set<PersonVaccine> personVaccines;
+    @OneToMany(
+            mappedBy = "person",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @ToString.Exclude
+    private List<PersonVaccine> vaccines = new ArrayList<>();
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "document_id", referencedColumnName = "id")
+    private Document documents;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass())
+            return false;
+
+        Person person = (Person) o;
+        return Objects.equals(email, person.email);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(email);
+    }
 
 }
